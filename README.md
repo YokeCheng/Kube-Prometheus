@@ -16,7 +16,7 @@ Components included in this package:
 * Highly available [Prometheus](https://prometheus.io/)
 * Highly available [Alertmanager](https://github.com/prometheus/alertmanager)
 * [Prometheus node-exporter](https://github.com/prometheus/node_exporter)
-* [Prometheus Adapter for Kubernetes Metrics APIs](https://github.com/DirectXMan12/k8s-prometheus-adapter)
+* [Prometheus Adapter for Kubernetes Metrics APIs](https://github.com/kubernetes-sigs/prometheus-adapter)
 * [kube-state-metrics](https://github.com/kubernetes/kube-state-metrics)
 * [Grafana](https://grafana.com/)
 
@@ -31,19 +31,21 @@ This means the kubelet configuration must contain these flags:
 * `--authentication-token-webhook=true` This flag enables, that a `ServiceAccount` token can be used to authenticate against the kubelet(s). This can also be enabled by setting the kubelet configuration value `authentication.webhook.enabled` to `true`.
 * `--authorization-mode=Webhook` This flag enables, that the kubelet will perform an RBAC request with the API to determine, whether the requesting entity (Prometheus in this case) is allowed to access a resource, in specific for this project the `/metrics` endpoint. This can also be enabled by setting the kubelet configuration value `authorization.mode` to `Webhook`.
 
-This stack provides [resource metrics](https://github.com/kubernetes/metrics#resource-metrics-api) by deploying the [Prometheus Adapter](https://github.com/DirectXMan12/k8s-prometheus-adapter/).
-This adapter is an Extension API Server and Kubernetes needs to be have this feature enabled, otherwise the adapter has no effect, but is still deployed.
+This stack provides [resource metrics](https://github.com/kubernetes/metrics#resource-metrics-api) by deploying
+the [Prometheus Adapter](https://github.com/kubernetes-sigs/prometheus-adapter).
+This adapter is an Extension API Server and Kubernetes needs to be have this feature enabled, otherwise the adapter has
+no effect, but is still deployed.
 
 ## Compatibility
 
 The following Kubernetes versions are supported and work as we test against these versions in their respective branches. But note that other versions might work!
 
-| kube-prometheus stack                                                                      | Kubernetes 1.19 | Kubernetes 1.20 | Kubernetes 1.21 | Kubernetes 1.22 | Kubernetes 1.23 |
+| kube-prometheus stack                                                                      | Kubernetes 1.20 | Kubernetes 1.21 | Kubernetes 1.22 | Kubernetes 1.23 | Kubernetes 1.24 |
 |--------------------------------------------------------------------------------------------|-----------------|-----------------|-----------------|-----------------|-----------------|
-| [`release-0.7`](https://github.com/prometheus-operator/kube-prometheus/tree/release-0.7)   | ✔               | ✔               | ✗               | ✗               | ✗               |
-| [`release-0.8`](https://github.com/prometheus-operator/kube-prometheus/tree/release-0.8)   | ✗               | ✔               | ✔               | ✗               | ✗               |
-| [`release-0.9`](https://github.com/prometheus-operator/kube-prometheus/tree/release-0.9)   | ✗               | ✗               | ✔               | ✔               | ✗               |
-| [`release-0.10`](https://github.com/prometheus-operator/kube-prometheus/tree/release-0.10) | ✗               | ✗               | ✗               | ✔               | ✔               |
+| [`release-0.8`](https://github.com/prometheus-operator/kube-prometheus/tree/release-0.8)   | ✔               | ✔               | ✗               | ✗               | ✗               |
+| [`release-0.9`](https://github.com/prometheus-operator/kube-prometheus/tree/release-0.9)   | ✗               | ✔               | ✔               | ✗               | ✗               |
+| [`release-0.10`](https://github.com/prometheus-operator/kube-prometheus/tree/release-0.10) | ✗               | ✗               | ✔               | ✔               | ✗               |
+| [`release-0.11`](https://github.com/prometheus-operator/kube-prometheus/tree/release-0.11) | ✗               | ✗               | ✗               | ✔               | ✔               |
 | [`main`](https://github.com/prometheus-operator/kube-prometheus/tree/main)                 | ✗               | ✗               | ✗               | ✗               | ✔               |
 
 ## Quickstart
