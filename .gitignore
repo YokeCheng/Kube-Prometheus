@@ -7,3 +7,5 @@ crdschemas/
 
 developer-workspace/gitpod/_output
 developer-workspace/codespaces/kind 
+/intranet/shell/images/
+/intranet/tool/

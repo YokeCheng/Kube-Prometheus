@@ -6,57 +6,12 @@
 
 > Note that everything is experimental and may change significantly at any time.
 
-This repository collects Kubernetes manifests, [Grafana](http://grafana.com/) dashboards, and [Prometheus rules](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/) combined with documentation and scripts to provide easy to operate end-to-end Kubernetes cluster monitoring with [Prometheus](https://prometheus.io/) using the Prometheus Operator.
+## 外网快速部署
 
-The content of this project is written in [jsonnet](http://jsonnet.org/). This project could both be described as a package as well as a library.
+> 注意：对于 Kubernetes v1.21.z 之前的版本，请参考【Kubernetes 兼容性矩阵】（兼容性），以便选择兼容的分支。
 
-Components included in this package:
-
-* The [Prometheus Operator](https://github.com/prometheus-operator/prometheus-operator)
-* Highly available [Prometheus](https://prometheus.io/)
-* Highly available [Alertmanager](https://github.com/prometheus/alertmanager)
-* [Prometheus node-exporter](https://github.com/prometheus/node_exporter)
-* [Prometheus Adapter for Kubernetes Metrics APIs](https://github.com/kubernetes-sigs/prometheus-adapter)
-* [kube-state-metrics](https://github.com/kubernetes/kube-state-metrics)
-* [Grafana](https://grafana.com/)
-
-This stack is meant for cluster monitoring, so it is pre-configured to collect metrics from all Kubernetes components. In addition to that it delivers a default set of dashboards and alerting rules. Many of the useful dashboards and alerts come from the [kubernetes-mixin project](https://github.com/kubernetes-monitoring/kubernetes-mixin), similar to this project it provides composable jsonnet as a library for users to customize to their needs.
-
-## Prerequisites
-
-You will need a Kubernetes cluster, that's it! By default it is assumed, that the kubelet uses token authentication and authorization, as otherwise Prometheus needs a client certificate, which gives it full access to the kubelet, rather than just the metrics. Token authentication and authorization allows more fine grained and easier access control.
-
-This means the kubelet configuration must contain these flags:
-
-* `--authentication-token-webhook=true` This flag enables, that a `ServiceAccount` token can be used to authenticate against the kubelet(s). This can also be enabled by setting the kubelet configuration value `authentication.webhook.enabled` to `true`.
-* `--authorization-mode=Webhook` This flag enables, that the kubelet will perform an RBAC request with the API to determine, whether the requesting entity (Prometheus in this case) is allowed to access a resource, in specific for this project the `/metrics` endpoint. This can also be enabled by setting the kubelet configuration value `authorization.mode` to `Webhook`.
-
-This stack provides [resource metrics](https://github.com/kubernetes/metrics#resource-metrics-api) by deploying
-the [Prometheus Adapter](https://github.com/kubernetes-sigs/prometheus-adapter).
-This adapter is an Extension API Server and Kubernetes needs to be have this feature enabled, otherwise the adapter has
-no effect, but is still deployed.
-
-## Compatibility
-
-The following Kubernetes versions are supported and work as we test against these versions in their respective branches. But note that other versions might work!
-
-| kube-prometheus stack                                                                      | Kubernetes 1.20 | Kubernetes 1.21 | Kubernetes 1.22 | Kubernetes 1.23 | Kubernetes 1.24 |
-|--------------------------------------------------------------------------------------------|-----------------|-----------------|-----------------|-----------------|-----------------|
-| [`release-0.8`](https://github.com/prometheus-operator/kube-prometheus/tree/release-0.8)   | ✔               | ✔               | ✗               | ✗               | ✗               |
-| [`release-0.9`](https://github.com/prometheus-operator/kube-prometheus/tree/release-0.9)   | ✗               | ✔               | ✔               | ✗               | ✗               |
-| [`release-0.10`](https://github.com/prometheus-operator/kube-prometheus/tree/release-0.10) | ✗               | ✗               | ✔               | ✔               | ✗               |
-| [`release-0.11`](https://github.com/prometheus-operator/kube-prometheus/tree/release-0.11) | ✗               | ✗               | ✗               | ✔               | ✔               |
-| [`main`](https://github.com/prometheus-operator/kube-prometheus/tree/main)                 | ✗               | ✗               | ✗               | ✗               | ✔               |
-
-## Quickstart
-
-> Note: For versions before Kubernetes v1.21.z refer to the [Kubernetes compatibility matrix](#compatibility) in order to choose a compatible branch.
-
-This project is intended to be used as a library (i.e. the intent is not for you to create your own modified copy of this repository).
-
-Though for a quickstart a compiled version of the Kubernetes [manifests](manifests) generated with this library (specifically with `example.jsonnet`) is checked into this repository in order to try the content out quickly. To try out the stack un-customized run:
-* Create the monitoring stack using the config in the `manifests` directory:
-
+该项目旨在用作库（即，目的不是让您创建自己的此存储库的修改副本）。尽管为了快速入门，使用此库（特别是使用 `example.jsonnet`）生成的 Kubernetes [manifests](manifests) 的编译版本已签入此存储库，以便快速尝试内容。要尝试未自定义的堆栈运行：使用 `manifests` 目录中的配置创建监控堆栈
+### 部署操作
 ```shell
 # Create the namespace and CRDs, and then wait for them to be available before creating the remaining resources
 kubectl apply --server-side -f manifests/setup
@@ -64,54 +19,35 @@ until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo ""; 
 kubectl apply -f manifests/
 ```
 
-We create the namespace and CustomResourceDefinitions first to avoid race conditions when deploying the monitoring components.
-Alternatively, the resources in both folders can be applied with a single command
-`kubectl apply --server-side -f manifests/setup -f manifests`, but it may be necessary to run the command multiple times for all components to
-be created successfully.
+我们首先创建命名空间和 CustomResourceDefinitions 以避免在部署监控组件时出现竞争条件。或者，可以使用单个命令“kubectl apply --server-side -f manifestssetup -f manifests”来应用两个文件夹中的资源，但可能需要多次运行该命令才能成功创建所有组件。
 
-* And to teardown the stack:
-
+### 删除操作
 ```shell
 kubectl delete --ignore-not-found=true -f manifests/ -f manifests/setup
 ```
 
-### minikube
+## 内网操作
+内网文件位于intranet文件夹中，文件夹中还包括镜像文件等
 
-To try out this stack, start [minikube](https://github.com/kubernetes/minikube) with the following command:
-
+### 解压镜像并推送到内网镜像仓库
 ```shell
-$ minikube delete && minikube start --kubernetes-version=v1.23.0 --memory=6g --bootstrapper=kubeadm --extra-config=kubelet.authentication-token-webhook=true --extra-config=kubelet.authorization-mode=Webhook --extra-config=scheduler.bind-address=0.0.0.0 --extra-config=controller-manager.bind-address=0.0.0.0
+# 进入目录
+cd intranet/shell
+
+# 更改变量，更改保存的镜像仓库地址
+vi var.sh
+
+# 执行导入镜像脚本
+bash ./load.sh
 ```
 
-The kube-prometheus stack includes a resource metrics API server, so the metrics-server addon is not necessary. Ensure the metrics-server addon is disabled on minikube:
-
+### 部署操作
 ```shell
-$ minikube addons disable metrics-server
+# 更改manifests中镜像的仓库地址，内部默认是10.18.1.102:9088
+# 可采用全选替换的方式
+
+# Create the namespace and CRDs, and then wait for them to be available before creating the remaining resources
+kubectl apply --server-side -f manifests/setup
+until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo ""; done
+kubectl apply -f manifests/
 ```
-
-## Getting started
-
-Before deploying kube-prometheus in a production environment, read:
-
-1. [Customizing kube-prometheus](docs/customizing.md)
-2. [Customization examples](docs/customizations)
-3. [Accessing Graphical User Interfaces](docs/access-ui.md)
-4. [Troubleshooting kube-prometheus](docs/troubleshooting.md)
-
-## Documentation
-
-1. [Continuous Delivery](examples/continuous-delivery)
-2. [Update to new version](docs/update.md)
-3. For more documentation on the project refer to `docs/` directory.
-
-## Contributing
-
-To contribute to kube-prometheus, refer to [Contributing](CONTRIBUTING.md).
-
-## Join the discussion
-
-If you have any questions or feedback regarding kube-prometheus, join the [kube-prometheus discussion](https://github.com/prometheus-operator/kube-prometheus/discussions). Alternatively, consider joining [the kubernetes slack #prometheus-operator channel](http://slack.k8s.io/) or project's bi-weekly [Contributor Office Hours](https://docs.google.com/document/d/1-fjJmzrwRpKmSPHtXN5u6VZnn39M28KqyQGBEJsqUOk/edit#).
-
-## License
-
-Apache License 2.0, see [LICENSE](https://github.com/prometheus-operator/kube-prometheus/blob/main/LICENSE).
