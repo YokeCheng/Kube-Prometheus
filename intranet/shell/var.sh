@@ -14,7 +14,8 @@ docker_save_images=(
 ['prometheus:v2.36.1']='quay.io/prometheus/prometheus:v2.36.1' \
 ['prometheus-adapter:v0.9.1']='willdockerhub/prometheus-adapter:v0.9.1' \
 ['prometheus-operator:v0.57.0']='quay.io/prometheus-operator/prometheus-operator:v0.57.0' \
-                )
+['prometheus-config-reloader:v0.57.0']='quay.io/prometheus-operator/prometheus-config-reloader:v0.57.0' \
+          )
 
 declare -A docker_load_images
 docker_load_images=(
@@ -28,6 +29,7 @@ docker_load_images=(
 ['prometheus:v2.36.1']='prometheus/prometheus:v2.36.1' \
 ['prometheus-adapter:v0.9.1']='willdockerhub/prometheus-adapter:v0.9.1' \
 ['prometheus-operator:v0.57.0']='prometheus-operator/prometheus-operator:v0.57.0' \
+['prometheus-config-reloader:v0.57.0']='prometheus-operator/prometheus-config-reloader:v0.57.0' \
                 )
 
 docker_registry='10.18.1.102:9088'

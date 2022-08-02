@@ -51,3 +51,18 @@ kubectl apply --server-side -f manifests/setup
 until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo ""; done
 kubectl apply -f manifests/
 ```
+
+## 部署问题
+
+### no matchs for kind "PodDisruptionBudget" in version "policy/v1"
+![img.png](img.png)
+解析: 集群版本可能比较低，当前资源的version可能还属于v1beta版本，可以通过下列命令查看一下，然后修改对应文件
+```shell
+# 查看资源
+kubectl api-resources
+
+# 查看版本
+kubectl api-versions
+```
+
+### grafana面板已通过nodePort开启了节点端口，默认端口31300
