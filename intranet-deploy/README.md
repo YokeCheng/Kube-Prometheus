@@ -6,7 +6,7 @@
 
 > Note that everything is experimental and may change significantly at any time.
 
-## 外网快速部署
+## 快速部署
 > 注意：对于 Kubernetes v1.21.z 之前的版本，请参考【Kubernetes 兼容性矩阵】（兼容性），以便选择兼容的分支。
 该项目旨在用作库（即，目的不是让您创建自己的此存储库的修改副本）。尽管为了快速入门，使用此库（特别是使用 `example.jsonnet`）生成的 Kubernetes [manifests](manifests) 的编译版本已签入此存储库，以便快速尝试内容。要尝试未自定义的堆栈运行：使用 `manifests` 目录中的配置创建监控堆栈
 ### 部署操作
@@ -25,29 +25,34 @@ kubectl delete --ignore-not-found=true -f manifests/ -f manifests/setup
 ```
 
 ## 内网操作
-内网文件位于intranet文件夹中，文件夹中还包括镜像文件等
+**内网部署操作与外网相同，不同的是需要提前将镜像等文件导入到内网镜像仓库中**
 
+## 文件夹解释
+内网部署文件位于intranet-deploy文件夹中，文件夹中还包括镜像文件，部署文件等等
+```script
+├─ ...
+├─ intranet-deploy                // 部署文件夹
+│  ├─ manifests                     //部署的yaml文件
+│  │  └── ...                        
+│  ├─images                         //导出导入的镜像包文件夹
+│  │  └── ...                   
+│  ├─script                         //脚本文件
+│  │  ├── var.sh                          // 镜像和内网仓库参数设置
+│  │  ├── save.sh                         // 外网导出镜像脚本
+│  │  └── load.sh                         // 内网导入镜像脚本
+│  └─tool                           //操作工具          
+│     └── kubectl                         // 镜像和内网仓库参数设置
+```
 ### 解压镜像并推送到内网镜像仓库
 ```shell
 # 进入目录
-cd intranet/shell
+cd intranet-deploy/shell
 
 # 更改变量，更改保存的镜像仓库地址
 vi var.sh
 
 # 执行导入镜像脚本
 bash ./load.sh
-```
-
-### 部署操作
-```shell
-# 更改manifests中镜像的仓库地址，内部默认是10.18.1.102:9088
-# 可采用全选替换的方式
-
-# Create the namespace and CRDs, and then wait for them to be available before creating the remaining resources
-kubectl apply --server-side -f manifests-intranet/setup
-# 需等待几秒以后在执行，可能需要重新执行几次试试
-kubectl apply -f manifests-intranet/
 ```
 
 ## 部署问题

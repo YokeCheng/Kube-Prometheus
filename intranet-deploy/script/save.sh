@@ -16,7 +16,7 @@ do
     save_name=${name_tag//:/-}
     save_name_tar=${save_name}'.tar'
     echo "${save_name_tar}"
-    echo `docker save -o ./images/$save_name_tar $name_tag`
+    echo `docker save -o ../images/$save_name_tar $name_tag`
 
     # rmi image
     echo `docker rmi $image_name`

@@ -9,7 +9,7 @@ do
     save_name_tar=${save_name}'.tar'
     echo "${save_name_tar}"
     # docker load tar
-    echo `docker load -i ./images/$save_name_tar`
+    echo `docker load -i ../images/$save_name_tar`
 
     # replace image tag
     image_name=${docker_load_images[${name_tag}]} # get value
